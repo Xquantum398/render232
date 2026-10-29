@@ -1,5 +1,5 @@
 const express = require("express");
-const { HttpsProxyAgent } = require("https-proxy-agent"); // npm install https-proxy-agent
+const { HttpsProxyAgent } = require("https-proxy-agent");
 
 const app = express();
 app.disable("x-powered-by");
@@ -11,7 +11,7 @@ const BASE_URL = "https://ze";
 const REFERRER = "https://ze";
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
 
-// --- Proxy Ayarları ---
+// --- Proxy ---
 const PROXY = {
   host: "45.38.107.97",
   port: 6014,
@@ -44,9 +44,7 @@ app.use((req, res, next) => {
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
   });
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
+  if (req.method === "OPTIONS") return res.status(204).end();
   if (!["GET", "HEAD"].includes(req.method)) {
     return res.status(405).send("Method Not Allowed");
   }
@@ -68,7 +66,7 @@ async function fetchUpstream(url, method = "GET") {
   return fetch(url, {
     method,
     redirect: "follow",
-    agent: proxyAgent,               // ← proxy burada
+    agent: proxyAgent,
     headers: {
       "User-Agent": USER_AGENT,
       Accept: "*/*",
@@ -197,26 +195,19 @@ function play(ch, btn) {
 }
 
 // --- Routes ---
-app.get("/", (req, res) => {
-  res.type("html").send(playerHTML(req));
-});
-
-app.get("/player", (req, res) => {
-  res.type("html").send(playerHTML(req));
-});
+app.get("/", (req, res) => res.type("html").send(playerHTML(req)));
+app.get("/player", (req, res) => res.type("html").send(playerHTML(req)));
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
 });
 
 app.get("/channels", (req, res) => {
-  res.json(
-    CHANNELS.map(([id, name]) => ({
-      id,
-      name,
-      source: STREAMS[id],
-    }))
-  );
+  res.json(CHANNELS.map(([id, name]) => ({
+    id,
+    name,
+    source: STREAMS[id],
+  })));
 });
 
 app.get("/playlist.m3u", (req, res) => {
@@ -230,7 +221,6 @@ app.get("/playlist.m3u", (req, res) => {
   res.type("application/vnd.apple.mpegurl").send(lines.join("\n") + "\n");
 });
 
-// Proxy endpoint (kendi sunucumuz üzerinden)
 app.get("/proxy", async (req, res) => {
   const target = req.query.url;
   if (!target || typeof target !== "string" || !target.startsWith("http")) {
@@ -247,20 +237,15 @@ app.get("/proxy", async (req, res) => {
     res.send(buffer);
   } catch (err) {
     console.error("Proxy error:", err.message);
-    res.status(502).json({
-      error: "PROXY_FAILED",
-      message: err.message,
-    });
+    res.status(502).json({ error: "PROXY_FAILED", message: err.message });
   }
 });
 
-// mono.m3u8
 app.get("/:id/mono.m3u8", async (req, res) => {
   const id = req.params.id;
   const stream = STREAMS[id];
-  if (!stream) {
-    return res.status(404).send("Kanal bulunamadı.");
-  }
+  if (!stream) return res.status(404).send("Kanal bulunamadı.");
+
   try {
     const upstream = await fetchUpstream(stream);
     if (!upstream.ok) {
@@ -291,11 +276,9 @@ app.get("/:id/mono.m3u8", async (req, res) => {
   }
 });
 
-app.use((req, res) => {
-  res.status(404).send("Not Found");
-});
+app.use((req, res) => res.status(404).send("Not Found"));
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Proxy: ${PROXY.host}:${PROXY.port}`);
+  console.log(`Proxy aktif: ${PROXY.host}:${PROXY.port}`);
 });
