@@ -24,13 +24,13 @@ const proxyAgent = new HttpsProxyAgent(proxyUrl);
 
 // --- Kanallar ---
 const CHANNELS = [
-  ["b1", "ts 1 HD"],
+  ["patron", "ts 1 HD"],
   ["b2", "5s 2 HD"],
   ["b3", "4s 3 HD"],
 ];
 
 const STREAMS = {
-  "b1": `${BASE_URL}b1/index.txt`,
+  "patron": `${BASE_URL}patron/mono.m3u8`,
   "b2": `${BASE_URL}b2/mono.m3u8`,
   "b3": `${BASE_URL}b3/mono.m3u8`,
 };
