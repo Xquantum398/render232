@@ -7,8 +7,8 @@ app.disable("etag");
 
 const PORT = process.env.PORT || 10000;
 const STATIC_LOGO = "https://i.hizliresim.com/8xzjgqv.jpg";
-const BASE_URL = "https://zeus728177.cfd/";
-const REFERRER = "https://zeustv272.live/";
+const BASE_URL = "https://f2q.zirvedesin247.cfd/";
+const REFERRER = "https://101baywintv.live/";
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
 
 // --- Proxy ---
