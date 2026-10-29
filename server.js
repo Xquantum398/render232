@@ -31,7 +31,7 @@ const CHANNELS = [
 
 const STREAMS = {
   "b1": `${BASE_URL}b1/index.txt`,
-  "b2": `${BASE_URL}b2/index.txt`,
+  "b2": `${BASE_URL}b2/mono.m3u8`,
   "b3": `${BASE_URL}b3/mono.m3u8`,
 };
 
