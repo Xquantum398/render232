@@ -1,92 +1,38 @@
 const express = require("express");
-const app = express();
+const { HttpsProxyAgent } = require("https-proxy-agent"); // npm install https-proxy-agent
 
+const app = express();
 app.disable("x-powered-by");
 app.disable("etag");
 
 const PORT = process.env.PORT || 10000;
-
 const STATIC_LOGO = "https://i.hizliresim.com/8xzjgqv.jpg";
-const BASE_URL = "https://zeus728177.cfd/";
-const REFERRER = "https://zeustv270.live/";
+const BASE_URL = "https://ze";
+const REFERRER = "https://ze";
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
 
+// --- Proxy Ayarları ---
+const PROXY = {
+  host: "45.38.107.97",
+  port: 6014,
+  username: "kcsoxakz",
+  password: "ik06zijcghnb",
+};
+
+const proxyUrl = `http://${PROXY.username}:${PROXY.password}@${PROXY.host}:${PROXY.port}`;
+const proxyAgent = new HttpsProxyAgent(proxyUrl);
+
+// --- Kanallar ---
 const CHANNELS = [
-  ["patron", "beIN Sports 1 HD"],
-  ["zirve", "beIN Sports 1 HD"], 
-  ["taraftarium", "beIN Sports 1 HD"], 
-  ["b1", "beIN Sports 1 HD"], 
-  ["b2", "beIN Sports 2 HD"],
-  ["b3", "beIN Sports 3 HD"],
-  ["b4", "beIN Sports 4 HD"],
-  ["b5", "beIN Sports 5 HD"],
-  ["bm1", "beIN SPORTS HD 1 MAX"],
-  ["bm2", "beIN SPORTS HD 2 MAX"],
-  ["ss", "S SPORTS 1 HD"],
-  ["ss2", "S SPORTS 2 HD"],
-  ["t1", "Tivibu SPORTS 1 HD"],
-  ["t2", "Tivibu SPORTS 2 HD"],
-  ["t3", "Tivibu SPORTS 3 HD"],
-  ["t4", "Tivibu SPORTS 4 HD"],
-  ["smarts", "Smart SPORTS 1 HD"],
-  ["sms2", "Smart SPORTS  2 HD"],
-  ["smarts2", "Smart SPORTS 1 HD"],
-  ["trtspor", "TRT SPORTS HD "],
-  ["trtspor2", "TRT Yıldız SPORTS HD"],
-  ["trt1", "TRT 1 HD "],
-  ["as", "A SPORTS HD "],
-  ["atv", "ATV HD "],
-  ["tv8", "TV 8 HD 3"],
-  ["tv85", "TV 8,5 HD 4"],
-  ["eu1", "EUROSPORT SPORTS HD 1"],
-  ["eu2", "EUROSPORT SPORTS HD 2"],
-  ["ex1", "EXXEN SPORTS 1 HD"],
-  ["ex2", "EXXEN SPORTS 2 HD"],
-  ["ex3", "EXXEN SPORTS 3 HD"],
-  ["ex4", "EXXEN SPORTS 4 HD"],
-  ["ex5", "EXXEN SPORTS 5 HD"],
-  ["ex6", "EXXEN SPORTS 6 HD"],
-  ["ex7", "EXXEN SPORTS 7 HD"],
-  ["ex8", "EXXEN SPORTS 8 HD"],
+  ["b1", "ts 1 HD"],
+  ["b2", "5s 2 HD"],
+  ["b3", "4s 3 HD"],
 ];
 
 const STREAMS = {
-  "patron": `${BASE_URL}patron/mono.m3u8`,
-  "zirve": `${BASE_URL}zirve/mono.m3u8`,
-  "taraftarium": `${BASE_URL}taraftarium/mono.m3u8`,
   "b1": `${BASE_URL}b1/index.txt`,
   "b2": `${BASE_URL}b2/index.txt`,
   "b3": `${BASE_URL}b3/mono.m3u8`,
-  "b4": `${BASE_URL}b4/mono.m3u8`,
-  "b5": `${BASE_URL}b5/mono.m3u8`,
-  "bm1": `${BASE_URL}bm1/mono.m3u8`,
-  "bm2": `${BASE_URL}bm2/mono.m3u8`,
-  "ss": `${BASE_URL}ss/mono.m3u8`,
-  "ss2": `${BASE_URL}ss2/mono.m3u8`,
-  "t1": `${BASE_URL}t1/mono.m3u8`,
-  "t2": `${BASE_URL}t2/mono.m3u8`,
-  "t3": `${BASE_URL}t3/mono.m3u8`,
-  "t4": `${BASE_URL}t4/mono.m3u8`,
-  "smarts": `${BASE_URL}smarts/mono.m3u8`,
-  "sms2": `${BASE_URL}sms2/mono.m3u8`,
-  "smarts2": `${BASE_URL}smarts2/mono.m3u8`,
-  "trtspor": `${BASE_URL}trtspor/mono.m3u8`,
-  "trtspor2": `${BASE_URL}trtspor2/mono.m3u8`,
-  "trt1": `${BASE_URL}trt1/mono.m3u8`,
-  "as": `${BASE_URL}as/mono.m3u8`,
-  "atv": `${BASE_URL}atv/mono.m3u8`,
-  "tv8": `${BASE_URL}tv8/mono.m3u8`,
-  "tv85": `${BASE_URL}tv85/mono.m3u8`,
-  "eu1": `${BASE_URL}eu1/mono.m3u8`,
-  "eu2": `${BASE_URL}eu2/mono.m3u8`,
-  "ex1": `${BASE_URL}ex1/mono.m3u8`,
-  "ex2": `${BASE_URL}ex2/mono.m3u8`,
-  "ex3": `${BASE_URL}ex3/mono.m3u8`,
-  "ex4": `${BASE_URL}ex4/mono.m3u8`,
-  "ex5": `${BASE_URL}ex5/mono.m3u8`,
-  "ex6": `${BASE_URL}ex6/mono.m3u8`,
-  "ex7": `${BASE_URL}ex7/mono.m3u8`,
-  "ex8": `${BASE_URL}ex8/mono.m3u8`,
 };
 
 // --- Middleware ---
@@ -98,7 +44,6 @@ app.use((req, res, next) => {
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
   });
-
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
@@ -114,14 +59,16 @@ function absoluteUrl(req, path) {
   return `${protocol}://${host}${path}`;
 }
 
-function proxyUrl(req, target) {
+function makeProxyUrl(req, target) {
   return absoluteUrl(req, "/proxy") + "?url=" + encodeURIComponent(target);
 }
 
+// Upstream istekleri proxy üzerinden
 async function fetchUpstream(url, method = "GET") {
   return fetch(url, {
     method,
     redirect: "follow",
+    agent: proxyAgent,               // ← proxy burada
     headers: {
       "User-Agent": USER_AGENT,
       Accept: "*/*",
@@ -184,7 +131,6 @@ const video = document.getElementById("video");
 const list = document.getElementById("channels");
 const statusEl = document.getElementById("status");
 let hls = null;
-
 channels.forEach(ch => {
   const btn = document.createElement("button");
   btn.className = "channel-btn";
@@ -197,18 +143,15 @@ channels.forEach(ch => {
   btn.onclick = () => play(ch, btn);
   list.appendChild(btn);
 });
-
 function play(ch, btn) {
   document.querySelectorAll(".channel-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   statusEl.className = "status";
   statusEl.textContent = "Yükleniyor: " + ch.name;
-
   if (hls) { hls.destroy(); hls = null; }
   video.pause();
   video.removeAttribute("src");
   video.load();
-
   if (window.Hls && Hls.isSupported()) {
     hls = new Hls({
       enableWorker: true,
@@ -218,13 +161,11 @@ function play(ch, btn) {
     });
     hls.loadSource(ch.url);
     hls.attachMedia(video);
-
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       video.play().catch(() => {
         statusEl.textContent = "Yayın hazır. Oynat'a basın.";
       });
     });
-
     hls.on(Hls.Events.ERROR, (_, data) => {
       if (data.fatal) {
         statusEl.textContent = "Yayın yüklenemedi: " + ch.name;
@@ -233,7 +174,6 @@ function play(ch, btn) {
         hls = null;
       }
     });
-
     video.onplaying = () => {
       statusEl.textContent = "Oynatılıyor: " + ch.name;
       statusEl.className = "status";
@@ -257,8 +197,6 @@ function play(ch, btn) {
 }
 
 // --- Routes ---
-
-// Ana sayfa → Player
 app.get("/", (req, res) => {
   res.type("html").send(playerHTML(req));
 });
@@ -267,12 +205,10 @@ app.get("/player", (req, res) => {
   res.type("html").send(playerHTML(req));
 });
 
-// Health
 app.get("/health", (req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
 });
 
-// Kanal listesi
 app.get("/channels", (req, res) => {
   res.json(
     CHANNELS.map(([id, name]) => ({
@@ -283,7 +219,6 @@ app.get("/channels", (req, res) => {
   );
 });
 
-// IPTV Playlist
 app.get("/playlist.m3u", (req, res) => {
   const lines = ["#EXTM3U"];
   for (const [id, name] of CHANNELS) {
@@ -295,25 +230,19 @@ app.get("/playlist.m3u", (req, res) => {
   res.type("application/vnd.apple.mpegurl").send(lines.join("\n") + "\n");
 });
 
-// Proxy (Worker’daki mantık)
+// Proxy endpoint (kendi sunucumuz üzerinden)
 app.get("/proxy", async (req, res) => {
   const target = req.query.url;
-
   if (!target || typeof target !== "string" || !target.startsWith("http")) {
     return res.status(400).send("Invalid proxy url");
   }
-
   try {
     const upstream = await fetchUpstream(target, req.method);
-
     if (!upstream.ok && upstream.status >= 400) {
       return res.status(upstream.status).send(`Upstream error ${upstream.status}`);
     }
-
     const contentType = upstream.headers.get("content-type");
     if (contentType) res.set("Content-Type", contentType);
-
-    // Stream body’yi direkt aktar
     const buffer = Buffer.from(await upstream.arrayBuffer());
     res.send(buffer);
   } catch (err) {
@@ -325,18 +254,15 @@ app.get("/proxy", async (req, res) => {
   }
 });
 
-// mono.m3u8 → playlist çek + tüm linkleri proxy’le
+// mono.m3u8
 app.get("/:id/mono.m3u8", async (req, res) => {
   const id = req.params.id;
   const stream = STREAMS[id];
-
   if (!stream) {
     return res.status(404).send("Kanal bulunamadı.");
   }
-
   try {
     const upstream = await fetchUpstream(stream);
-
     if (!upstream.ok) {
       return res.status(502).json({
         error: "UPSTREAM_ERROR",
@@ -345,16 +271,11 @@ app.get("/:id/mono.m3u8", async (req, res) => {
         source: stream,
       });
     }
-
     let text = await upstream.text();
-
-    // Worker’daki gibi: tüm http/https linklerini proxy’ye çevir
     text = text.replace(/(https?:\/\/[^\s"']+)/g, (full) => {
-      // zaten bizim proxy ise dokunma
       if (full.includes(req.get("host"))) return full;
-      return proxyUrl(req, full);
+      return makeProxyUrl(req, full);
     });
-
     res
       .type("application/vnd.apple.mpegurl")
       .set("Cache-Control", "no-store")
@@ -370,11 +291,11 @@ app.get("/:id/mono.m3u8", async (req, res) => {
   }
 });
 
-// 404
 app.use((req, res) => {
   res.status(404).send("Not Found");
 });
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Proxy: ${PROXY.host}:${PROXY.port}`);
 });
